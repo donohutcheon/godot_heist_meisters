@@ -31,3 +31,4 @@ func night_vision_mode():
 
 func dark_vision_mode():
 	$Label.hide()
+

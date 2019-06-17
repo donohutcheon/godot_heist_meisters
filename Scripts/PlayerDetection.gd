@@ -30,10 +30,12 @@ func player_is_in_FOV_TOLERANCE():
 func player_is_in_los():
 	var space = get_world_2d().direct_space_state
 	var los_obstacle = space.intersect_ray(global_position, player.global_position, [self], collision_mask)
+	if not los_obstacle:
+		return false
 	var distance_to_player = player.global_position.distance_to(global_position)
 	var player_in_range = distance_to_player < MAX_DETECTION_RANGE
-	if !los_obstacle.has("collider"):
-		print (los_obstacle)
+#	if not los_obstacle.has("collider"):
+#		print (los_obstacle)
 	return (los_obstacle.has("collider") && los_obstacle.collider == player) and player_in_range
 
 func night_vision_mode():

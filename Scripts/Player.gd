@@ -1,5 +1,9 @@
 extends "res://Scripts/Character.gd"
 
+export var disguises = 3 #how many disguises you start with.
+export var disguise_duration = 5 #how long each disguises last
+export var disguise_slowdown = 0.25
+
 const NIGHT_VISION_MAX_CHARGE = 10
 const NIGHT_VISION_MIN_USE_CHARGE = 4
 const NIGHT_VISION_RECHARGE_RATE = 1
@@ -10,15 +14,24 @@ enum VISION_MODES {DARK, NIGHT_VISION}
 var vision_mode = VISION_MODES.DARK
 var vision_change_on_cooldown = false
 var night_vision_charge = 0
+var disguised = false
+var velocity_multiplier = 1
+onready var remaining_disguises = disguises
 
 func _ready():
 	Global.player = self
 	vision_mode = VISION_MODES.DARK
+	show_player()
+	$Timer.wait_time = disguise_duration
+	get_tree().call_group("interface", "on_player_disguised", remaining_disguises)
 	
 func _process(delta):
 	update_motion(delta)
 	update_vision_mode(delta)
-	move_and_slide(motion)
+	move_and_slide(motion * velocity_multiplier)
+	if disguised:
+		$Label.rect_rotation = -rotation_degrees
+		$Label.text = str( $Timer.time_left).pad_decimals(2)
 	
 func update_motion(delta):
 	look_at(get_global_mouse_position())
@@ -40,6 +53,8 @@ func update_motion(delta):
 func _input(event):
 	if Input.is_action_just_pressed("ui_vision_mode_change") and (night_vision_charge > NIGHT_VISION_MIN_USE_CHARGE):
 		cycle_vision_mode()
+	if Input.is_action_just_pressed("toggle_disguise"):
+		toggle_disguise()
 
 func cycle_vision_mode():
 	match vision_mode:
@@ -68,3 +83,39 @@ func update_vision_mode(delta):
 			night_vision_charge = clamp(night_vision_charge  - (NIGHT_VISION_DISCHARGE_RATE * delta), 0, NIGHT_VISION_MAX_CHARGE);
 			if night_vision_charge == 0:
 				cycle_vision_mode()
+				
+func show_player():
+	$Label.hide()
+	$Sprite.texture = load(Global.player_sprite)
+	$Light2D.texture = load(Global.player_sprite)
+	$LightOccluder2D.occluder = load(Global.player_occluder)
+	$CollisionShape2D.shape = load(Global.player_collision_shape)
+	collision_layer = 1
+	velocity_multiplier = 1
+	self.disguised = false;
+	
+func show_box():
+	$Label.show()
+	$Sprite.texture = load(Global.box_sprite)
+	$Light2D.texture = load(Global.box_sprite)
+	$LightOccluder2D.occluder = load(Global.box_occluder)
+	$CollisionShape2D.shape = load(Global.box_collision_shape)
+	collision_layer = 16
+	velocity_multiplier = disguise_slowdown
+	$Timer.start()
+	remaining_disguises -= 1
+	self.disguised = true;
+	get_tree().call_group("interface", "on_player_disguised", remaining_disguises)
+	
+
+func toggle_disguise():
+	print(disguised)
+	if disguised:
+		show_player()
+	elif remaining_disguises > 0:
+		show_box()
+
+func collect_briefcase():
+	var loot = Node.new()
+	loot.set_name("Briefcase")
+	add_child(loot)

@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scenes/ComputerPopup.tscn" type="PackedScene" id=1]
+[ext_resource path="res://GFX/Interface/Fonts/kenvector_future_thin.ttf" type="DynamicFontData" id=2]
+
+[sub_resource type="DynamicFont" id=1]
+font_data = ExtResource( 2 )
+
+[node name="CellphonePopup" instance=ExtResource( 1 )]
+margin_right = 300.0
+margin_bottom = 480.0
+rect_min_size = Vector2( 200, 320 )
+
+[node name="NinePatchRect" parent="." index="0"]
+rect_min_size = Vector2( 200, 320 )
+
+[node name="dotGreen" parent="." index="2"]
+position = Vector2( 26.1373, 12.7694 )
+scale = Vector2( 0.344158, 0.372024 )
+
+[node name="RichTextLabel" parent="." index="3"]
+custom_fonts/normal_font = SubResource( 1 )

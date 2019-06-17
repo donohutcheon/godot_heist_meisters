@@ -21,6 +21,3 @@ func _init():
 				var coord = Vector2(i, j) + originCoord
 				tile_set.autotile_set_light_occluder(h, occluderPoly, coord) 
 
-
-func _ready():
-	pass

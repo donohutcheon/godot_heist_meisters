@@ -29,7 +29,6 @@ func check_input():
 		reset_lock()
 		$KeypadSoundEffects.stream = keypad_access_denied_beep
 		$KeypadSoundEffects.play()
-	
 
 func enter(digit):
 	input.append(digit)
